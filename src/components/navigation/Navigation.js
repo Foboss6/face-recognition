@@ -1,7 +1,7 @@
 import React from 'react';
 import Logo from './Logo';
 
-const Navigation = ({onRouteChange, route}) => {
+const Navigation = ({onRouteChange, route, signOut}) => {
   return (
     <nav style={{
           display: 'grid',
@@ -26,7 +26,7 @@ const Navigation = ({onRouteChange, route}) => {
           </p>
           :
           <p className='tr f4 link dim black underline pa3 ma0 pointer'
-              onClick={() => onRouteChange('signin')}>
+              onClick={() => {signOut(); onRouteChange('signin')}}>
             Sign Out
           </p>
       }
