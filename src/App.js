@@ -35,13 +35,16 @@ class App extends React.Component {
   }
 
   loadUser = (user) => {
-    this.setState({user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      entries: user.entries,
-      joined: user.joined,
-    }})
+    this.setState({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        entries: user.entries,
+        joined: user.joined,
+      },
+      isSignedIn: true,
+    })
   }
 
   calcFaceLocation = (data) => {
@@ -56,9 +59,6 @@ class App extends React.Component {
         leftCol: el.region_info.bounding_box.left_col * 100 + '%'
       })
     });
-    
-    console.log('FaceBox: ');
-    console.log(faceBox);
 
     this.setState({faceBox});//If names are the same, we can write like this
   }
@@ -68,40 +68,48 @@ class App extends React.Component {
   }
 
   onSubmit = () => {
-    this.setState({imageURL: this.state.input});
-    // https://i.ibb.co/Ycvqqdy/03.jpg
-    // https://i.ibb.co/K2MT36y/01.jpg
-    // https://i.ibb.co/LPq7RfW/05.jpg
-    // https://i.ibb.co/JFn8jfH/02.jpg
-    // https://i.ibb.co/DM4H7sp/04.jpg
-    // https://i.ibb.co/LnRXr66/06.jpg
-    // https://i.ibb.co/zXjfdDV/07.jpg
+    if(this.state.input) {
+      this.setState({imageURL: this.state.input});
+      // https://i.ibb.co/Ycvqqdy/03.jpg
+      // https://i.ibb.co/K2MT36y/01.jpg
+      // https://i.ibb.co/LPq7RfW/05.jpg
+      // https://i.ibb.co/JFn8jfH/02.jpg
+      // https://i.ibb.co/DM4H7sp/04.jpg
+      // https://i.ibb.co/LnRXr66/06.jpg
+      // https://i.ibb.co/zXjfdDV/07.jpg
 
-    console.log(this.state.input);
-    app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
-      .then(response => {
-        if(response) {
-          fetch('http://localhost:3001/image', {
-            method: 'put',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              id: this.state.user.id,
-            }),
-          })
-          .then(response => response.json())
-          .then(data => {
-            if(data) {
-              this.setState(Object.assign(this.state.user, {entries: data}));
-            }
-          });
-        }
-        this.calcFaceLocation(response)
-      })
-      .catch(err => console.log('An error occur '+ err));
+      app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
+        .then(response => {
+          if(response) {
+            fetch('http://localhost:3001/image', {
+              method: 'put',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                id: this.state.user.id,
+              }),
+            })
+            .then(response => response.json())
+            .then(data => {
+              if(data) {
+                this.setState(Object.assign(this.state.user, {entries: data}));
+              }
+            });
+          }
+          this.calcFaceLocation(response)
+        })
+        .catch(err => console.log('An error occur '+ err));
+    } else console.log('An empty URL');
   }
 
   onRouteChange = (route) => {
     this.setState({route});
+  }
+
+  signOut = () => {
+    this.setState({
+      isSignedIn: false,
+      imageURL: '',
+    });
   }
 
   render() {
@@ -112,18 +120,37 @@ class App extends React.Component {
       id="tsparticles"
       options={particlesOptions}
       />
-      <Navigation onRouteChange={this.onRouteChange} route={this.state.route}/>
-      {this.state.route === 'home'
+      <Navigation 
+        onRouteChange={this.onRouteChange} 
+        route={this.state.route} 
+        signOut={this.signOut}
+      />
+      {
+        this.state.route === 'home'
         ? <>
-            <Rank name={this.state.user.name} entries={this.state.user.entries}/>
-            <ImageLinkForm onInputChange={this.onInputChange} onSubmit={this.onSubmit}/>
-            <FaceRecognition imageURL={this.state.imageURL} faceBox={this.state.faceBox} />
+            <Rank 
+              name={this.state.user.name} 
+              entries={this.state.user.entries}
+            />
+            <ImageLinkForm 
+              onInputChange={this.onInputChange} 
+              onSubmit={this.onSubmit}
+            />
+            <FaceRecognition 
+              imageURL={this.state.imageURL} 
+              faceBox={this.state.faceBox} 
+            />
           </>
-        : (
-            this.state.route === 'signin'
-              ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-              : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-          )
+        :
+          this.state.route === 'signin'
+          ? <Signin
+              loadUser={this.loadUser} 
+              onRouteChange={this.onRouteChange}
+            />
+          : <Register
+              loadUser={this.loadUser} 
+              onRouteChange={this.onRouteChange}
+            />
       }
     </div>
   );
