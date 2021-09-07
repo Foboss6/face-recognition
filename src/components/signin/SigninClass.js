@@ -29,7 +29,7 @@ class Signin extends React.Component {
     })
     .then(response => response.json())
     .then(data => {
-      if(data !== 'Error signin') {
+      if(data.id) {
         this.props.loadUser(data);
         this.props.onRouteChange('home');
       } else this.setState({errorSignin: data});
@@ -68,11 +68,10 @@ class Signin extends React.Component {
                   onChange={this.onPasswordChange}
                 />
               </div>
-              <label className="pa0 ma0 lh-copy f6 pointer"><input type="checkbox" /> Remember me</label>
             </fieldset>
             {
               this.state.errorSignin
-              ? <p>Please, enter a valid data</p>
+              ? <p>{this.state.errorSignin}</p>
               : <></>
             }
             <div className="">
@@ -84,7 +83,6 @@ class Signin extends React.Component {
             </div>
             <div className="lh-copy mt3">
               <p className="f6 link dim black db pointer" onClick={() => onRouteChange('register')}>Register</p>
-              <a href="#0" className="f6 link dim black db">Forgot your password?</a>
             </div>
           </div>
         </main>
