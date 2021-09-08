@@ -70,13 +70,6 @@ class App extends React.Component {
   onSubmit = () => {
     if(this.state.input) {
       this.setState({imageURL: this.state.input});
-      // https://i.ibb.co/Ycvqqdy/03.jpg
-      // https://i.ibb.co/K2MT36y/01.jpg
-      // https://i.ibb.co/LPq7RfW/05.jpg
-      // https://i.ibb.co/JFn8jfH/02.jpg
-      // https://i.ibb.co/DM4H7sp/04.jpg
-      // https://i.ibb.co/LnRXr66/06.jpg
-      // https://i.ibb.co/zXjfdDV/07.jpg
 
       app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
         .then(response => {
