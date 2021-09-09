@@ -15,23 +15,24 @@ const app = new Clarifai.App({
  apiKey: '36e78ee2086541978395dbf2c333d59f'
 });
 
+const initialState = {
+  input: '',
+  imageURL: '',
+  faceBox: [],
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: '',
+    joined: '',
+  }
+};
 class App extends React.Component {
   constructor() {
     super();
-    this.state = {
-      input: '',
-      imageURL: '',
-      faceBox: [],
-      route: 'signin',
-      isSignedIn: false,
-      user: {
-        id: '',
-        name: '',
-        email: '',
-        entries: '',
-        joined: '',
-      }
-    }
+    this.state = initialState;
   }
 
   loadUser = (user) => {
@@ -74,7 +75,7 @@ class App extends React.Component {
       app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
         .then(response => {
           if(response) {
-            fetch('http://localhost:3001/image', {
+            fetch('https://shielded-waters-65429.herokuapp.com/image', {
               method: 'put',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify({
@@ -86,7 +87,8 @@ class App extends React.Component {
               if(data) {
                 this.setState(Object.assign(this.state.user, {entries: data}));
               }
-            });
+            })
+            .catch(console.log);
           }
           this.calcFaceLocation(response)
         })
@@ -99,10 +101,7 @@ class App extends React.Component {
   }
 
   signOut = () => {
-    this.setState({
-      isSignedIn: false,
-      imageURL: '',
-    });
+    this.setState(initialState);
   }
 
   render() {
