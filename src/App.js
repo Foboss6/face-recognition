@@ -7,6 +7,7 @@ import Particles from "react-tsparticles";
 import FaceRecognition from './components/FaceRecognition';
 import Signin from './components/signin/SigninClass';
 import Register from './components/register/RegisterClass';
+import { SERVER_PATH } from './components/server-path';
 
 // import Clarifai from 'clarifai'; 
 const Clarifai = require('clarifai');
@@ -61,7 +62,7 @@ class App extends React.Component {
       })
     });
 
-    this.setState({faceBox});//If names are the same, we can write like this
+    this.setState({faceBox});
   }
 
   onInputChange = (event) => {
@@ -75,7 +76,7 @@ class App extends React.Component {
       app.models.predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
         .then(response => {
           if(response) {
-            fetch('https://shielded-waters-65429.herokuapp.com/image', {
+            fetch(`${SERVER_PATH}/image`, {
               method: 'put',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify({

@@ -4,7 +4,7 @@ import './FaceRecognition.css';
 const FaceRecognition = ({ imageURL, faceBox }) => {
   if(imageURL) 
     return(
-       <section className='flex justify-center' >
+       <div className='flex justify-center' >
          <div className='absolute w-60'>
           {
             !!imageURL
@@ -25,7 +25,7 @@ const FaceRecognition = ({ imageURL, faceBox }) => {
             <></>
           }
         </div>
-       </section>
+       </div>
     );
     else return(<></>);
 }

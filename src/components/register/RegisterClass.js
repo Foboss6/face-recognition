@@ -1,4 +1,5 @@
 import React from 'react';
+import { SERVER_PATH } from '../server-path';
 
 class Register extends React.Component {
   constructor(props) {
@@ -7,30 +8,38 @@ class Register extends React.Component {
       name: '',
       email: '',
       password: '',
+      errorRegister: '',
     }
   }
   
   onInputChange = (event, fieldName) => {
-    this.setState({[fieldName]: event.target.value})
+    if(event.target.value.length > 2) {
+        this.setState({[fieldName]: event.target.value});
+      }
   }
 
   onSubmit = () => {
-    fetch('https://shielded-waters-65429.herokuapp.com/register', {
-      method: 'post',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        name: this.state.name,
-        email: this.state.email,
-        password: this.state.password,
-      }),
-    })
-    .then(response => response.json())
-    .then(user => {
-      if(user) {
-        this.props.loadUser(user);
-        this.props.onRouteChange('home');
-      }
-    });
+    if(this.state.name && this.state.email && this.state.password) {
+      fetch(`${SERVER_PATH}/register`, {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          name: this.state.name,
+          email: this.state.email,
+          password: this.state.password,
+        }),
+      })
+      .then(response => response.json())
+      .then(user => {
+        if(user.id) {
+          this.props.loadUser(user);
+          this.props.onRouteChange('home');
+        } else if(user.detail.includes('exist')) {
+            this.setState({errorRegister: 'The user with this email already exists'});
+          }
+      })
+      .catch(console.log);
+    } else this.setState({errorRegister: 'Enter correct data'});
   }
 
   render() {
@@ -74,6 +83,13 @@ class Register extends React.Component {
                   autoComplete="new-password"
                   onChange={(event) => this.onInputChange(event, 'password')}
                 />
+              </div>
+              <div>
+                {
+                  this.state.errorRegister
+                  ? <p>{this.state.errorRegister}</p>
+                  : <></>
+                }
               </div>
             </fieldset>
             <div className="">

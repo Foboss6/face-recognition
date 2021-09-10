@@ -1,4 +1,5 @@
 import React from 'react';
+import { SERVER_PATH } from '../server-path';
 
 class Signin extends React.Component {
   constructor(props) {
@@ -19,21 +20,24 @@ class Signin extends React.Component {
   }
 
   onSubmit = () => {
-    fetch('https://shielded-waters-65429.herokuapp.com/signin', {
-      method: 'post',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: this.state.signinEmail,
-        password: this.state.signinPassword,
-      }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      if(data.id) {
-        this.props.loadUser(data);
-        this.props.onRouteChange('home');
-      } else this.setState({errorSignin: data});
-    });
+    if(this.state.signinEmail && this.state.signinPassword) {
+      fetch(`${SERVER_PATH}/signin`, {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          email: this.state.signinEmail,
+          password: this.state.signinPassword,
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.id) {
+          this.props.loadUser(data);
+          this.props.onRouteChange('home');
+        } else this.setState({errorSignin: data});
+      })
+      .catch(console.log);
+    } else this.setState({errorSignin: 'Fill the email and password fields'});
   }
   
   render () {
